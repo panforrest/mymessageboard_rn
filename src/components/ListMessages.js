@@ -5,20 +5,48 @@ import {
   StyleSheet,
   FlatList
 } from 'react-native'
+import { APIManager } from '../utils'
+import MessageRow from './MessageRow'
 
 class ListMessages extends Component {
+  constructor(props){
+    super(props)
+    this.state = {
+      messages: []
+    }
+  }
+
+  componentDidMount(){
+
+    APIManager.get('https://mymessagebo-backend.herokuapp.com/api/message', null, (err, response) => {
+      if (err) {
+        const msg = err.message || err
+        alert(msg)
+        return
+      }
+
+      console.log('componentDidMount: '+JSON.stringify(response.results))
+      const restults = response.results
+      this.setState({
+        messages: restults
+      })
+    })
+  }
+
   render(){
     return(
       <View>
         <FlatList
-          data = {[
-            {user: 'Alice', messageBody: 'What is the agenda for Video 2.1?'}, 
-            {user: 'Bob', messageBody: 'Make react native app by sharing codes from react'}, 
-            {user: 'Charles', messageBody: 'Task 1 is sharing react app folder structure/componets'}, 
-            {user: 'Forrest', messageBody: 'Task 2 update MessageBox, AddMessage, ListMessages'},             
-          ]}
+          data = {
+            this.state.messages.map((message, index) => {
+              return(
+                message
+              )
+            })
+
+          }
           renderItem={
-            ({item}) => <Text style={style.item}>{item.user}: {item.messageBody}</Text>
+            ({item, index}) => <MessageRow message={item} index={index} style={styles.item}/>
           }
           keyExtractor = {(item, index) => index.toString()}
         />
@@ -27,7 +55,7 @@ class ListMessages extends Component {
   }
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   item: {
     padding: 10,
     fontSize: 15
