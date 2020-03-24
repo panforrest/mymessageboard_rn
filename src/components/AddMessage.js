@@ -6,23 +6,51 @@ import {
   TextInput,
   TouchableOpacity
 } from 'react-native'
+import { APIManager } from '../utils'
 
 class AddMessage extends Component {
+  constructor(props){
+    super(props)
+    this.state = {
+      user: '',
+      messageBody: ''
+    }
+  }
+
+  handleSubmit = () => {
+    APIManager.post('https://mymessagebo-backend.herokuapp.com/api/message', this.state, (err, response) => {
+      if (err) {
+        const msg = err.message || err
+        alert(msg)
+        return
+      }
+
+      console.log('componentDidMount: '+JSON.stringify(response))
+    })
+  }
+
   render(){
     return(
       <View>
         <TextInput
           placeholder="User"
           style={style.input}
+          onChangeText = { user => this.setState
+            ({user: user})
+          }
         />
 
         <TextInput
           placeholder="Message Body"
           style={style.input}
+          onChangeText = { messageBody => this.setState
+            ({messageBody: messageBody})
+          }
         />
 
         <TouchableOpacity
           style={style.button}
+          onPress={this.handleSubmit}
         >
           <Text style={style.buttonText}> SUBMIT </Text>
         </TouchableOpacity>
